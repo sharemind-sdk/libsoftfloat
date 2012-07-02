@@ -42,6 +42,11 @@ ADD_DEFINITIONS("-D_XOPEN_SOURCE=500" "-D__STDC_LIMIT_MACROS")
 # libsoftfloat
 ################################################################################
 
+SET(SHAREMIND_LIBSOFTFLOAT_HEADERS
+    "3rdparty/libsoftfloat/milieu.h"
+    "3rdparty/libsoftfloat/softfloat.h"
+)
+
 ADD_LIBRARY("libsoftfloat" STATIC "3rdparty/libsoftfloat/softfloat.c")
 SET_SOURCE_FILES_PROPERTIES("3rdparty/libsoftfloat/softfloat.c" PROPERTIES
                             COMPILE_FLAGS "-fPIC")
@@ -51,3 +56,5 @@ SET_TARGET_PROPERTIES("libsoftfloat" PROPERTIES
                       VERSION "0.1.0.0"
                       SOVERSION "0.1"
                       COMPILE_FLAGS "-frounding-math -ftrapping-math -fsignaling-nans")
+
+INSTALL(FILES ${SHAREMIND_LIBSOFTFLOAT_HEADERS} DESTINATION "${SHAREMIND_INCLUDE_DESTINATION}/3rdparty/softfloat/")
