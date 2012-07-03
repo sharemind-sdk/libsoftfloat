@@ -47,9 +47,9 @@ SET(SHAREMIND_LIBSOFTFLOAT_HEADERS
     "3rdparty/libsoftfloat/softfloat.h"
 )
 
-ADD_LIBRARY("libsoftfloat" STATIC "3rdparty/libsoftfloat/softfloat.c")
+ADD_LIBRARY("libsoftfloat" STATIC "3rdparty/libsoftfloat/softfloat.c" ${SHAREMIND_LIBSOFTFLOAT_HEADERS})
 SET_SOURCE_FILES_PROPERTIES("3rdparty/libsoftfloat/softfloat.c" PROPERTIES
-                            COMPILE_FLAGS "-fPIC")
+                            COMPILE_FLAGS "-fPIC -ggdb")
 SET_TARGET_PROPERTIES("libsoftfloat" PROPERTIES
                       OUTPUT_NAME "sharemind_softfloat"
                       LIBRARY_OUTPUT_DIRECTORY "${SHAREMIND_LIB_DIR}"
