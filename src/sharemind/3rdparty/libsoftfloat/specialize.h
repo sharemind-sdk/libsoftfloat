@@ -71,9 +71,7 @@ typedef struct {
 
 static inline sf_flag sf_float32_is_nan(sf_float32 a);
 static inline sf_flag sf_float32_is_nan(sf_float32 a) {
-
-    return ( 0xFF000000 < (sf_bits32) ( a<<1 ) );
-
+    return (0xFF000000 < (sf_bits32) (a << 1));
 }
 
 /*----------------------------------------------------------------------------
@@ -82,9 +80,7 @@ static inline sf_flag sf_float32_is_nan(sf_float32 a) {
 *----------------------------------------------------------------------------*/
 
 static inline sf_flag sf_float32_is_signaling_nan_(sf_float32 a) {
-
-    return ( ( ( a>>22 ) & 0x1FF ) == 0x1FE ) && ( a & 0x003FFFFF );
-
+    return (((a >> 22) & 0x1FF) == 0x1FE) && (a & 0x003FFFFF);
 }
 sf_flag sf_float32_is_signaling_nan(sf_float32 a) {
     return sf_float32_is_signaling_nan_(a);
@@ -96,13 +92,15 @@ sf_flag sf_float32_is_signaling_nan(sf_float32 a) {
 | exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline sf_commonNaNT sf_float32ToCommonNaN(sf_float32 a) {
+static inline sf_commonNaNT sf_float32ToCommonNaN(sf_float32 a, sf_fpu_state * fpu) {
     sf_commonNaNT z;
 
-    if ( sf_float32_is_signaling_nan_( a ) ) sf_float_raise( sf_float_flag_invalid );
-    z.sign = (sf_flag) (a>>31);
+    if (sf_float32_is_signaling_nan_(a))
+        sf_float_raise(*fpu, sf_float_flag_invalid);
+
+    z.sign = (sf_flag) (a >> 31);
     z.low = 0;
-    z.high = ( (sf_bits64) a )<<41;
+    z.high = ((sf_bits64) a) << 41;
     return z;
 
 }
@@ -113,9 +111,7 @@ static inline sf_commonNaNT sf_float32ToCommonNaN(sf_float32 a) {
 *----------------------------------------------------------------------------*/
 
 static inline sf_float32 sf_commonNaNToFloat32(sf_commonNaNT a) {
-
-    return (sf_float32) (( ( (sf_bits32) a.sign )<<31 ) | 0x7FC00000 | ( a.high>>41 ));
-
+    return (sf_float32) ((((sf_bits32) a.sign) << 31) | 0x7FC00000 | (a.high >> 41));
 }
 
 /*----------------------------------------------------------------------------
@@ -124,29 +120,38 @@ static inline sf_float32 sf_commonNaNToFloat32(sf_commonNaNT a) {
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline  sf_float32 sf_propagateFloat32NaN(sf_float32 a, sf_float32 b) {
+static inline sf_result32f sf_propagateFloat32NaN(sf_float32 a, sf_float32 b, sf_fpu_state fpu) {
     sf_flag aIsNaN, aIsSignalingNaN, bIsNaN, bIsSignalingNaN;
 
-    aIsNaN = sf_float32_is_nan( a );
-    aIsSignalingNaN = sf_float32_is_signaling_nan_( a );
-    bIsNaN = sf_float32_is_nan( b );
-    bIsSignalingNaN = sf_float32_is_signaling_nan_( b );
+    aIsNaN = sf_float32_is_nan(a);
+    aIsSignalingNaN = sf_float32_is_signaling_nan_(a);
+    bIsNaN = sf_float32_is_nan(b);
+    bIsSignalingNaN = sf_float32_is_signaling_nan_(b);
     a |= 0x00400000;
     b |= 0x00400000;
-    if ( aIsSignalingNaN | bIsSignalingNaN ) sf_float_raise( sf_float_flag_invalid );
-    if ( aIsSignalingNaN ) {
-        if ( bIsSignalingNaN ) goto returnLargerSignificand;
-        return bIsNaN ? b : a;
-    }
-    else if ( aIsNaN ) {
-        if ( bIsSignalingNaN | ! bIsNaN ) return a;
- returnLargerSignificand:
-        if ( (sf_bits32) ( a<<1 ) < (sf_bits32) ( b<<1 ) ) return b;
-        if ( (sf_bits32) ( b<<1 ) < (sf_bits32) ( a<<1 ) ) return a;
-        return ( a < b ) ? a : b;
-    }
-    else {
-        return b;
+    if (aIsSignalingNaN | bIsSignalingNaN)
+        sf_float_raise(fpu, sf_float_flag_invalid);
+
+    if (aIsSignalingNaN) {
+        if (bIsSignalingNaN)
+            goto returnLargerSignificand;
+
+        return (sf_result32f) { (bIsNaN ? b : a), fpu };
+    } else if (aIsNaN) {
+        if (bIsSignalingNaN | !bIsNaN)
+            return (sf_result32f) { a, fpu };
+
+returnLargerSignificand:
+
+        if ((sf_bits32) (a << 1) < (sf_bits32) (b << 1))
+            return (sf_result32f) { b, fpu };
+
+        if ((sf_bits32) (b << 1) < (sf_bits32) (a << 1))
+            return (sf_result32f) { a, fpu };
+
+        return (sf_result32f) { ((a < b) ? a : b), fpu };
+    } else {
+        return (sf_result32f) { b, fpu };
     }
 
 }
@@ -154,7 +159,7 @@ static inline  sf_float32 sf_propagateFloat32NaN(sf_float32 a, sf_float32 b) {
 /*----------------------------------------------------------------------------
 | The pattern for a default generated double-precision NaN.
 *----------------------------------------------------------------------------*/
-#define sf_float64_default_nan SF_LIT64( 0xFFF8000000000000 )
+#define sf_float64_default_nan SF_LIT64(0xFFF8000000000000)
 
 /*----------------------------------------------------------------------------
 | Returns 1 if the double-precision floating-point value `a' is a NaN;
@@ -164,7 +169,7 @@ static inline  sf_float32 sf_propagateFloat32NaN(sf_float32 a, sf_float32 b) {
 static inline sf_flag sf_float64_is_nan(sf_float64 a);
 static inline sf_flag sf_float64_is_nan(sf_float64 a) {
 
-    return ( SF_LIT64( 0xFFE0000000000000 ) < (sf_bits64) ( a<<1 ) );
+    return (SF_LIT64(0xFFE0000000000000) < (sf_bits64) (a << 1));
 
 }
 
@@ -174,11 +179,7 @@ static inline sf_flag sf_float64_is_nan(sf_float64 a) {
 *----------------------------------------------------------------------------*/
 
 static inline sf_flag sf_float64_is_signaling_nan_(sf_float64 a) {
-
-    return
-           ( ( ( a>>51 ) & 0xFFF ) == 0xFFE )
-        && ( a & SF_LIT64( 0x0007FFFFFFFFFFFF ) );
-
+    return (((a >> 51) & 0xFFF) == 0xFFE) && (a & SF_LIT64(0x0007FFFFFFFFFFFF));
 }
 sf_flag sf_float64_is_signaling_nan(sf_float64 a) {
     return sf_float64_is_signaling_nan_(a);
@@ -190,15 +191,16 @@ sf_flag sf_float64_is_signaling_nan(sf_float64 a) {
 | exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline  sf_commonNaNT sf_float64ToCommonNaN(sf_float64 a) {
+static inline sf_commonNaNT sf_float64ToCommonNaN(sf_float64 a, sf_fpu_state * fpu) {
     sf_commonNaNT z;
 
-    if ( sf_float64_is_signaling_nan_( a ) ) sf_float_raise( sf_float_flag_invalid );
-    z.sign = (sf_flag) (a>>63);
-    z.low = 0;
-    z.high = a<<12;
-    return z;
+    if (sf_float64_is_signaling_nan_(a))
+        sf_float_raise(*fpu, sf_float_flag_invalid);
 
+    z.sign = (sf_flag) (a >> 63);
+    z.low = 0;
+    z.high = a << 12;
+    return z;
 }
 
 /*----------------------------------------------------------------------------
@@ -207,12 +209,9 @@ static inline  sf_commonNaNT sf_float64ToCommonNaN(sf_float64 a) {
 *----------------------------------------------------------------------------*/
 
 static inline sf_float64 sf_commonNaNToFloat64(sf_commonNaNT a) {
-
-    return
-          ( ( (sf_bits64) a.sign )<<63 )
-        | SF_LIT64( 0x7FF8000000000000 )
-        | ( a.high>>12 );
-
+    return (((sf_bits64) a.sign) << 63)
+           | SF_LIT64(0x7FF8000000000000)
+           | (a.high >> 12);
 }
 
 /*----------------------------------------------------------------------------
@@ -221,31 +220,41 @@ static inline sf_float64 sf_commonNaNToFloat64(sf_commonNaNT a) {
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
 
-static inline sf_float64 sf_propagateFloat64NaN(sf_float64 a, sf_float64 b) {
+static inline sf_result64f sf_propagateFloat64NaN(sf_float64 a, sf_float64 b,
+                                                  sf_fpu_state fpu)
+{
     sf_flag aIsNaN, aIsSignalingNaN, bIsNaN, bIsSignalingNaN;
 
-    aIsNaN = sf_float64_is_nan( a );
-    aIsSignalingNaN = sf_float64_is_signaling_nan_( a );
-    bIsNaN = sf_float64_is_nan( b );
-    bIsSignalingNaN = sf_float64_is_signaling_nan_( b );
-    a |= SF_LIT64( 0x0008000000000000 );
-    b |= SF_LIT64( 0x0008000000000000 );
-    if ( aIsSignalingNaN | bIsSignalingNaN ) sf_float_raise( sf_float_flag_invalid );
-    if ( aIsSignalingNaN ) {
-        if ( bIsSignalingNaN ) goto returnLargerSignificand;
-        return bIsNaN ? b : a;
-    }
-    else if ( aIsNaN ) {
-        if ( bIsSignalingNaN | ! bIsNaN ) return a;
- returnLargerSignificand:
-        if ( (sf_bits64) ( a<<1 ) < (sf_bits64) ( b<<1 ) ) return b;
-        if ( (sf_bits64) ( b<<1 ) < (sf_bits64) ( a<<1 ) ) return a;
-        return ( a < b ) ? a : b;
-    }
-    else {
-        return b;
-    }
+    aIsNaN = sf_float64_is_nan(a);
+    aIsSignalingNaN = sf_float64_is_signaling_nan_(a);
+    bIsNaN = sf_float64_is_nan(b);
+    bIsSignalingNaN = sf_float64_is_signaling_nan_(b);
+    a |= SF_LIT64(0x0008000000000000);
+    b |= SF_LIT64(0x0008000000000000);
+    if (aIsSignalingNaN | bIsSignalingNaN)
+        sf_float_raise(fpu, sf_float_flag_invalid);
 
+    if (aIsSignalingNaN) {
+        if (bIsSignalingNaN)
+            goto returnLargerSignificand;
+
+        return (sf_result64f) { (bIsNaN ? b : a), fpu };
+    } else if (aIsNaN) {
+        if (bIsSignalingNaN | !bIsNaN)
+            return (sf_result64f) { a, fpu };
+
+returnLargerSignificand:
+
+        if ((sf_bits64) (a << 1) < (sf_bits64) (b << 1))
+            return (sf_result64f) { b, fpu };
+
+        if ((sf_bits64) (b << 1) < (sf_bits64) (a << 1))
+            return (sf_result64f) { a, fpu };
+
+        return (sf_result64f) { ((a < b) ? a : b), fpu };
+    } else {
+        return (sf_result64f) { b, fpu };
+    }
 }
 
 #ifdef __cplusplus

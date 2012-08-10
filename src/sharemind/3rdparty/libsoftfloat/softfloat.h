@@ -54,35 +54,80 @@ typedef sf_bits64 sf_float64;
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point underflow tininess-detection mode.
+| bit 0
 *----------------------------------------------------------------------------*/
-extern sf_int8 sf_float_detect_tininess;
-enum {
-    sf_float_tininess_after_rounding  = 0,
-    sf_float_tininess_before_rounding = 1
-};
+#define sf_fpu_state_tininess_mask (0x01)
+#define sf_float_tininess_after_rounding  (0x0)
+#define sf_float_tininess_before_rounding (0x1)
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point rounding mode.
+| bits 1 and 2
 *----------------------------------------------------------------------------*/
-extern sf_int8 sf_float_rounding_mode;
-enum {
-    sf_float_round_nearest_even = 0,
-    sf_float_round_to_zero      = 1,
-    sf_float_round_down         = 2,
-    sf_float_round_up           = 3
-};
+#define sf_fpu_state_rounding_mask (0x06)
+#define sf_float_round_nearest_even (0x00 << 1u)
+#define sf_float_round_to_zero      (0x01 << 1u)
+#define sf_float_round_down         (0x02 << 1u)
+#define sf_float_round_up           (0x03 << 1u)
+
+/*----------------------------------------------------------------------------
+| Software IEC/IEEE floating-point exception flags as crash values.
+| bits 3 to 8
+*----------------------------------------------------------------------------*/
+#define sf_fpu_state_exception_crash_mask (0xf8)
+#define sf_float_flag_crash_inexact   (0x01 << 3u)
+#define sf_float_flag_crash_underflow (0x02 << 3u)
+#define sf_float_flag_crash_overflow  (0x04 << 3u)
+#define sf_float_flag_crash_divbyzero (0x08 << 3u)
+#define sf_float_flag_crash_invalid   (0x10 << 3u)
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point exception flags.
+| bits 9 to 13
 *----------------------------------------------------------------------------*/
-extern sf_int8 sf_float_exception_flags;
-enum {
-    sf_float_flag_inexact   =  1,
-    sf_float_flag_underflow =  2,
-    sf_float_flag_overflow  =  4,
-    sf_float_flag_divbyzero =  8,
-    sf_float_flag_invalid   = 16
-};
+#define sf_fpu_state_exception_mask (0x1f00)
+#define sf_float_flag_inexact   (0x01 << 8u)
+#define sf_float_flag_underflow (0x02 << 8u)
+#define sf_float_flag_overflow  (0x04 << 8u)
+#define sf_float_flag_divbyzero (0x08 << 8u)
+#define sf_float_flag_invalid   (0x10 << 8u)
+
+/*----------------------------------------------------------------------------
+| Software FPU state.
+*----------------------------------------------------------------------------*/
+typedef sf_int16 sf_fpu_state;
+#define sf_fpu_state_default ((sf_fpu_state) (sf_float_tininess_after_rounding \
+                                              | sf_float_round_nearest_even \
+                                              | sf_float_flag_crash_divbyzero \
+                                              | sf_float_flag_crash_invalid))
+
+/*----------------------------------------------------------------------------
+| Software IEC/IEEE floating-point function results carrying the FPU state.
+*----------------------------------------------------------------------------*/
+typedef struct {
+    sf_flag result;
+    sf_fpu_state fpu_state;
+} sf_resultFlag;
+
+typedef struct {
+    sf_float32 result;
+    sf_fpu_state fpu_state;
+} sf_result32f;
+
+typedef struct {
+    sf_int32 result;
+    sf_fpu_state fpu_state;
+} sf_result32i;
+
+typedef struct {
+    sf_float64 result;
+    sf_fpu_state fpu_state;
+} sf_result64f;
+
+typedef struct {
+    sf_int64 result;
+    sf_fpu_state fpu_state;
+} sf_result64i;
 
 /*----------------------------------------------------------------------------
 | Routine to raise any or all of the software IEC/IEEE floating-point
@@ -91,7 +136,7 @@ enum {
 | to substitute a result value.  If traps are not implemented, this routine
 | should be simply `float_exception_flags |= flags;'.
 *----------------------------------------------------------------------------*/
-#define sf_float_raise(flags) do { sf_float_exception_flags |= flags; } while(0)
+#define sf_float_raise(state,flags) do { (state) |= (flags); } while (0)
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE integer-to-floating-point values of 1.0000:
@@ -102,79 +147,79 @@ enum {
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE integer-to-floating-point conversion routines.
 *----------------------------------------------------------------------------*/
-sf_float32 sf_int32_to_float32( sf_int32 );
-sf_float64 sf_int32_to_float64( sf_int32 );
-sf_float32 sf_int64_to_float32( sf_int64 );
-sf_float64 sf_int64_to_float64( sf_int64 );
+sf_result32f sf_int32_to_float32(sf_int32, sf_fpu_state);
+sf_float64 sf_int32_to_float64(sf_int32);
+sf_result32f sf_int64_to_float32(sf_int64, sf_fpu_state);
+sf_result64f sf_int64_to_float64(sf_int64, sf_fpu_state);
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE single-precision conversion routines.
 *----------------------------------------------------------------------------*/
-sf_int32 sf_float32_to_int32( sf_float32 );
-sf_int32 sf_float32_to_int32_round_to_zero( sf_float32 );
-sf_int64 sf_float32_to_int64( sf_float32 );
-sf_int64 sf_float32_to_int64_round_to_zero( sf_float32 );
-sf_float64 sf_float32_to_float64( sf_float32 );
+sf_result32i sf_float32_to_int32(sf_float32, sf_fpu_state);
+sf_result32i sf_float32_to_int32_round_to_zero(sf_float32, sf_fpu_state);
+sf_result64i sf_float32_to_int64(sf_float32, sf_fpu_state);
+sf_result64i sf_float32_to_int64_round_to_zero(sf_float32, sf_fpu_state);
+sf_result64f sf_float32_to_float64(sf_float32, sf_fpu_state);
 
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE packing routines.
 *----------------------------------------------------------------------------*/
-sf_float32 sf_roundAndPackFloat32(sf_flag zSign, sf_int16 zExp, sf_bits32 zSig);
-sf_float64 sf_roundAndPackFloat64(sf_flag zSign, sf_int16 zExp, sf_bits64 zSig);
+sf_result32f sf_roundAndPackFloat32(sf_flag, sf_int16, sf_bits32, sf_fpu_state);
+sf_result64f sf_roundAndPackFloat64(sf_flag, sf_int16, sf_bits64, sf_fpu_state);
 
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE single-precision operations.
 *----------------------------------------------------------------------------*/
-sf_float32 sf_float32_round_to_int( sf_float32 );
-inline sf_float32 sf_float32_neg( const sf_float32 n ) {
+sf_result32f sf_float32_round_to_int(sf_float32, sf_fpu_state);
+inline sf_float32 sf_float32_neg(const sf_float32 n) {
     return n ^ (sf_bits32) 0x80000000;
 }
-sf_float32 sf_float32_add( sf_float32, sf_float32 );
-sf_float32 sf_float32_sub( sf_float32, sf_float32 );
-sf_float32 sf_float32_mul( sf_float32, sf_float32 );
-sf_float32 sf_float32_div( sf_float32, sf_float32 );
-sf_float32 sf_float32_rem( sf_float32, sf_float32 );
-sf_float32 sf_float32_sqrt( sf_float32 );
-sf_flag sf_float32_eq( sf_float32, sf_float32 );
-sf_flag sf_float32_le( sf_float32, sf_float32 );
-sf_flag sf_float32_lt( sf_float32, sf_float32 );
-sf_flag sf_float32_eq_signaling( sf_float32, sf_float32 );
-sf_flag sf_float32_le_quiet( sf_float32, sf_float32 );
-sf_flag sf_float32_lt_quiet( sf_float32, sf_float32 );
-sf_flag sf_float32_is_signaling_nan( sf_float32 );
+sf_result32f sf_float32_add(sf_float32, sf_float32, sf_fpu_state);
+sf_result32f sf_float32_sub(sf_float32, sf_float32, sf_fpu_state);
+sf_result32f sf_float32_mul(sf_float32, sf_float32, sf_fpu_state);
+sf_result32f sf_float32_div(sf_float32, sf_float32, sf_fpu_state);
+sf_result32f sf_float32_rem(sf_float32, sf_float32, sf_fpu_state);
+sf_result32f sf_float32_sqrt(sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_eq(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_le(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_lt(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_eq_signaling(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_le_quiet(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_lt_quiet(sf_float32, sf_float32, sf_fpu_state);
+sf_flag sf_float32_is_signaling_nan(sf_float32);
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE double-precision conversion routines.
 *----------------------------------------------------------------------------*/
-sf_int32 sf_float64_to_int32( sf_float64 );
-sf_int32 sf_float64_to_int32_round_to_zero( sf_float64 );
-sf_int64 sf_float64_to_int64( sf_float64 );
-sf_int64 sf_float64_to_int64_round_to_zero( sf_float64 );
-sf_float32 sf_float64_to_float32( sf_float64 );
+sf_result32i sf_float64_to_int32(sf_float64, sf_fpu_state);
+sf_result32i sf_float64_to_int32_round_to_zero(sf_float64, sf_fpu_state);
+sf_result64i sf_float64_to_int64(sf_float64, sf_fpu_state);
+sf_result64i sf_float64_to_int64_round_to_zero(sf_float64, sf_fpu_state);
+sf_result32f sf_float64_to_float32(sf_float64, sf_fpu_state);
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE double-precision operations.
 *----------------------------------------------------------------------------*/
-sf_float64 sf_float64_round_to_int( sf_float64 );
-inline sf_float64 sf_float64_neg( const sf_float64 n ) {
+sf_result64f sf_float64_round_to_int(sf_float64, sf_fpu_state);
+static inline sf_float64 sf_float64_neg(const sf_float64 n) {
     return n ^ (sf_bits64) SF_ULIT64(0x8000000000000000);
 }
-sf_float64 sf_float64_add( sf_float64, sf_float64 );
-sf_float64 sf_float64_sub( sf_float64, sf_float64 );
-sf_float64 sf_float64_mul( sf_float64, sf_float64 );
-sf_float64 sf_float64_div( sf_float64, sf_float64 );
-sf_float64 sf_float64_rem( sf_float64, sf_float64 );
-sf_float64 sf_float64_sqrt( sf_float64 );
-sf_flag sf_float64_eq( sf_float64, sf_float64 );
-sf_flag sf_float64_le( sf_float64, sf_float64 );
-sf_flag sf_float64_lt( sf_float64, sf_float64 );
-sf_flag sf_float64_eq_signaling( sf_float64, sf_float64 );
-sf_flag sf_float64_le_quiet( sf_float64, sf_float64 );
-sf_flag sf_float64_lt_quiet( sf_float64, sf_float64 );
-sf_flag sf_float64_is_signaling_nan( sf_float64 );
-    
+sf_result64f sf_float64_add(sf_float64, sf_float64, sf_fpu_state);
+sf_result64f sf_float64_sub(sf_float64, sf_float64, sf_fpu_state);
+sf_result64f sf_float64_mul(sf_float64, sf_float64, sf_fpu_state);
+sf_result64f sf_float64_div(sf_float64, sf_float64, sf_fpu_state);
+sf_result64f sf_float64_rem(sf_float64, sf_float64, sf_fpu_state);
+sf_result64f sf_float64_sqrt(sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_eq(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_le(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_lt(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_eq_signaling(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_le_quiet(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_lt_quiet(sf_float64, sf_float64, sf_fpu_state);
+sf_flag sf_float64_is_signaling_nan(sf_float64);
+
 #pragma GCC visibility pop
 
 #ifdef __cplusplus
