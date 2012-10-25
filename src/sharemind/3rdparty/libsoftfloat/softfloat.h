@@ -95,7 +95,7 @@ typedef sf_bits64 sf_float64;
 /*----------------------------------------------------------------------------
 | Software FPU state.
 *----------------------------------------------------------------------------*/
-typedef sf_int16 sf_fpu_state;
+typedef sf_uint16 sf_fpu_state;
 #define sf_fpu_state_default ((sf_fpu_state) (sf_float_tininess_after_rounding \
                                               | sf_float_round_nearest_even \
                                               | sf_float_flag_crash_divbyzero \
