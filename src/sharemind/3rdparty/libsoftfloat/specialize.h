@@ -44,12 +44,6 @@ these four paragraphs for those parts of this code that are retained.
 extern "C" {
 #endif
 
-/*----------------------------------------------------------------------------
-| Underflow tininess-detection mode, statically initialized to default value.
-| (The declaration in `softfloat.h' must match the `int8' type here.)
-*----------------------------------------------------------------------------*/
-sf_int8 sf_float_detect_tininess = sf_float_tininess_after_rounding;
-
 
 /*----------------------------------------------------------------------------
 | Internal canonical NaN format.

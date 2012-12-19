@@ -427,7 +427,7 @@ sf_result64f sf_roundAndPackFloat64(sf_flag zSign,
         }
 
         if (zExp < 0) {
-            isTiny = (sf_float_detect_tininess == sf_float_tininess_before_rounding)
+            isTiny = ((fpu & sf_fpu_state_tininess_mask) == sf_float_tininess_before_rounding)
                      || (zExp < -1)
                      || (zSig + (sf_uint64) roundIncrement < SF_LIT64(0x8000000000000000));
             sf_shift64RightJamming(zSig, -zExp, &zSig);
