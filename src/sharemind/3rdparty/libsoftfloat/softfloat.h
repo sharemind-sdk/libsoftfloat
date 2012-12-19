@@ -149,6 +149,10 @@ typedef struct {
 *----------------------------------------------------------------------------*/
 sf_result32f sf_int32_to_float32(sf_int32, sf_fpu_state);
 sf_float64 sf_int32_to_float64(sf_int32);
+inline sf_result64f sf_int32_to_float64_fpu(const sf_int32 v, const sf_fpu_state fpu) {
+    return (sf_result64f) { sf_int32_to_float64(v), fpu };
+}
+
 sf_result32f sf_int64_to_float32(sf_int64, sf_fpu_state);
 sf_result64f sf_int64_to_float64(sf_int64, sf_fpu_state);
 
