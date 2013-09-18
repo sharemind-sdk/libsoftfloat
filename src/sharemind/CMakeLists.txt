@@ -47,5 +47,8 @@ SET_TARGET_PROPERTIES("libsoftfloat" PROPERTIES
                       SOVERSION "0.1"
                       COMPILE_FLAGS "-frounding-math -ftrapping-math -fsignaling-nans")
 
+INSTALL(TARGETS "libsoftfloat"
+        ARCHIVE DESTINATION "lib")
+
 INSTALL(FILES ${SHAREMIND_LIBSOFTFLOAT_HEADERS}
         DESTINATION "include/sharemind/3rdparty/softfloat/")
