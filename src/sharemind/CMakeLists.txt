@@ -51,4 +51,4 @@ INSTALL(TARGETS "libsoftfloat"
         ARCHIVE DESTINATION "lib")
 
 INSTALL(FILES ${SHAREMIND_LIBSOFTFLOAT_HEADERS}
-        DESTINATION "include/sharemind/3rdparty/softfloat/")
+        DESTINATION "include/sharemind/3rdparty/libsoftfloat/")
