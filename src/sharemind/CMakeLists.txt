@@ -30,8 +30,8 @@ ENDMACRO(FLAGS_MAGIC)
 FLAGS_MAGIC("Weverything")
 FLAGS_MAGIC("Wlogical-op")
 
-
-ADD_DEFINITIONS("-D_XOPEN_SOURCE=500" "-D__STDC_LIMIT_MACROS")
+SET(LIBSOFTFLOAT_INSTALL_DEFINITIONS "-D__STDC_LIMIT_MACROS")
+ADD_DEFINITIONS("${LIBSOFTFLOAT_INSTALL_DEFINITIONS}")
 
 ################################################################################
 # libsoftfloat
@@ -45,9 +45,11 @@ SET(SHAREMIND_LIBSOFTFLOAT_HEADERS
 ADD_LIBRARY("libsoftfloat" STATIC "3rdparty/libsoftfloat/softfloat.c" ${SHAREMIND_LIBSOFTFLOAT_HEADERS})
 SET_SOURCE_FILES_PROPERTIES("3rdparty/libsoftfloat/softfloat.c" PROPERTIES
                             COMPILE_FLAGS "-fPIC -ggdb")
+
+SET(LIBSOFTFLOAT_VERSION "0.1.0.0")
 SET_TARGET_PROPERTIES("libsoftfloat" PROPERTIES
                       OUTPUT_NAME "sharemind_softfloat"
-                      VERSION "0.1.0.0"
+                      VERSION "${LIBSOFTFLOAT_VERSION}"
                       SOVERSION "0.1"
                       COMPILE_FLAGS "-frounding-math -ftrapping-math -fsignaling-nans")
 
@@ -56,3 +58,17 @@ INSTALL(TARGETS "libsoftfloat"
 
 INSTALL(FILES ${SHAREMIND_LIBSOFTFLOAT_HEADERS}
         DESTINATION "include/sharemind/3rdparty/libsoftfloat/")
+
+# Install cmake files:
+FILE(GLOB_RECURSE sharemind_libsoftfloat_in_files "${CMAKE_CURRENT_SOURCE_DIR}/*.in")
+ADD_CUSTOM_TARGET("include_sharemind_libsoftfloat_in_files_in_IDE" SOURCES ${sharemind_libsoftfloat_in_files})
+SET(LIBSOFTFLOAT_INSTALL_LINK_LIBRARIES "-L${CMAKE_INSTALL_PREFIX}/lib" "-lsharemind_softfloat")
+SET(LIBSOFTFLOAT_INSTALL_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/SharemindLibsoftfloatConfig.cmake.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/SharemindLibsoftfloatConfig.cmake" @ONLY)
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/SharemindLibsoftfloatConfigVersion.cmake.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/SharemindLibsoftfloatConfigVersion.cmake" @ONLY)
+INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/SharemindLibsoftfloatConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/SharemindLibsoftfloatConfigVersion.cmake"
+        DESTINATION "lib/SharemindLibsoftfloat")
