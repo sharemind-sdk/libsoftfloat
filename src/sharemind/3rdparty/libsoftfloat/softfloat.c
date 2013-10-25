@@ -89,7 +89,7 @@ static sf_result32i sf_roundAndPackInt32(sf_flag zSign, sf_bits64 absZ, sf_fpu_s
     roundBits = absZ & 0x7F;
     absZ = (absZ + (sf_bits64) roundIncrement) >> 7;
     absZ &= ~((sf_bits64) (((roundBits ^ 0x40) == 0) & roundNearestEven));
-    z = (sf_int32) absZ;
+    z = (sf_sbits32) absZ;
     if (zSign)
         z = -z;
 
