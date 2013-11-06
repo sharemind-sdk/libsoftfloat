@@ -15,9 +15,6 @@ FOREACH(dir IN LISTS CMAKE_PREFIX_PATH)
   INCLUDE_DIRECTORIES(BEFORE SYSTEM "${dir}/include")
 ENDFOREACH()
 
-FIND_PACKAGE(Boost REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-
 SET(CMAKE_C_FLAGS "-std=c99 -Wall -Wextra -O2 -fstrict-aliasing -Wstrict-aliasing=1 -fwrapv -Wabi -Wbad-function-cast -Wc++-compat -Wformat -Wswitch-default -Wunused -Wfloat-equal -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wconversion -Wsign-conversion -Wunused-macros")
 
 INCLUDE(CheckCCompilerFlag)
