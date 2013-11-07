@@ -7,15 +7,24 @@
 # code is subject to the appropriate license agreement.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION "2.8")
+CMAKE_MINIMUM_REQUIRED(VERSION "2.8.12")
 CMAKE_POLICY(SET CMP0015 NEW)
 PROJECT("SHAREMIND_LIBSOFTFLOAT" "C")
 
 FOREACH(dir IN LISTS CMAKE_PREFIX_PATH)
   INCLUDE_DIRECTORIES(BEFORE SYSTEM "${dir}/include")
 ENDFOREACH()
+INCLUDE_DIRECTORIES(BEFORE SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
-SET(CMAKE_C_FLAGS "-std=c99 -Wall -Wextra -O2 -fstrict-aliasing -Wstrict-aliasing=1 -fwrapv -Wabi -Wbad-function-cast -Wc++-compat -Wformat -Wswitch-default -Wunused -Wfloat-equal -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wconversion -Wsign-conversion -Wunused-macros")
+ADD_COMPILE_OPTIONS(
+  "-O2"
+  "$<$<NOT:$<STREQUAL:$<CONFIGURATION>,Release>>:-ggdb>"
+  "$<$<NOT:$<STREQUAL:$<CONFIGURATION>,Release>>:-fno-omit-frame-pointer>"
+  "$<$<STREQUAL:$<CONFIGURATION>,Release>:-DNDEBUG>"
+  "$<$<STREQUAL:$<CONFIGURATION>,Release>:-fomit-frame-pointer>"
+)
+
+SET(CMAKE_C_FLAGS "-std=c99 -Wall -Wextra -fstrict-aliasing -Wstrict-aliasing=1 -fwrapv -Wabi -Wbad-function-cast -Wc++-compat -Wformat -Wswitch-default -Wunused -Wfloat-equal -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wconversion -Wsign-conversion -Wunused-macros")
 
 INCLUDE(CheckCCompilerFlag)
 MACRO(FLAGS_MAGIC flags)
