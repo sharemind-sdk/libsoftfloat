@@ -20,7 +20,7 @@ ENDFOREACH()
 INCLUDE_DIRECTORIES(BEFORE SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
 ADD_COMPILE_OPTIONS(
-  "-O2"
+  "-O2" "-Wextra" "-Wall"
   "$<$<NOT:$<STREQUAL:$<CONFIGURATION>,Release>>:-ggdb>"
   "$<$<NOT:$<STREQUAL:$<CONFIGURATION>,Release>>:-fno-omit-frame-pointer>"
   "$<$<STREQUAL:$<CONFIGURATION>,Release>:-DNDEBUG>"
