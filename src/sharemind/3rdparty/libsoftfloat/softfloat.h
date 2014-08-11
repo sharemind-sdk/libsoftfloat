@@ -56,41 +56,41 @@ typedef sf_bits64 sf_float64;
 | Software IEC/IEEE floating-point underflow tininess-detection mode.
 | bit 0
 *----------------------------------------------------------------------------*/
-#define sf_fpu_state_tininess_mask (0x01)
-#define sf_float_tininess_after_rounding  (0x0)
-#define sf_float_tininess_before_rounding (0x1)
+#define sf_fpu_state_tininess_mask (0x01u)
+#define sf_float_tininess_after_rounding  (0x0u)
+#define sf_float_tininess_before_rounding (0x1u)
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point rounding mode.
 | bits 1 and 2
 *----------------------------------------------------------------------------*/
-#define sf_fpu_state_rounding_mask (0x06)
-#define sf_float_round_nearest_even (0x00 << 1u)
-#define sf_float_round_to_zero      (0x01 << 1u)
-#define sf_float_round_down         (0x02 << 1u)
-#define sf_float_round_up           (0x03 << 1u)
+#define sf_fpu_state_rounding_mask (0x06u)
+#define sf_float_round_nearest_even (0x00u << 1u)
+#define sf_float_round_to_zero      (0x01u << 1u)
+#define sf_float_round_down         (0x02u << 1u)
+#define sf_float_round_up           (0x03u << 1u)
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point exception flags as crash values.
 | bits 3 to 8
 *----------------------------------------------------------------------------*/
-#define sf_fpu_state_exception_crash_mask (0xf8)
-#define sf_float_flag_crash_inexact   (0x01 << 3u)
-#define sf_float_flag_crash_underflow (0x02 << 3u)
-#define sf_float_flag_crash_overflow  (0x04 << 3u)
-#define sf_float_flag_crash_divbyzero (0x08 << 3u)
-#define sf_float_flag_crash_invalid   (0x10 << 3u)
+#define sf_fpu_state_exception_crash_mask (0xf8u)
+#define sf_float_flag_crash_inexact   (0x01u << 3u)
+#define sf_float_flag_crash_underflow (0x02u << 3u)
+#define sf_float_flag_crash_overflow  (0x04u << 3u)
+#define sf_float_flag_crash_divbyzero (0x08u << 3u)
+#define sf_float_flag_crash_invalid   (0x10u << 3u)
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point exception flags.
 | bits 9 to 13
 *----------------------------------------------------------------------------*/
-#define sf_fpu_state_exception_mask (0x1f00)
-#define sf_float_flag_inexact   (0x01 << 8u)
-#define sf_float_flag_underflow (0x02 << 8u)
-#define sf_float_flag_overflow  (0x04 << 8u)
-#define sf_float_flag_divbyzero (0x08 << 8u)
-#define sf_float_flag_invalid   (0x10 << 8u)
+#define sf_fpu_state_exception_mask (0x1f00u)
+#define sf_float_flag_inexact   (0x01u << 8u)
+#define sf_float_flag_underflow (0x02u << 8u)
+#define sf_float_flag_overflow  (0x04u << 8u)
+#define sf_float_flag_divbyzero (0x08u << 8u)
+#define sf_float_flag_invalid   (0x10u << 8u)
 
 /*----------------------------------------------------------------------------
 | Software FPU state.
