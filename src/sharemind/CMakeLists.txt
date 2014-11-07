@@ -40,7 +40,7 @@ FLAGS_MAGIC("Weverything")
 FLAGS_MAGIC("Wlogical-op")
 
 SET(LIBSOFTFLOAT_INSTALL_DEFINITIONS "-D__STDC_LIMIT_MACROS" "-D__STDC_CONSTANT_MACROS")
-ADD_DEFINITIONS("${LIBSOFTFLOAT_INSTALL_DEFINITIONS}")
+ADD_DEFINITIONS(${LIBSOFTFLOAT_INSTALL_DEFINITIONS})
 
 ################################################################################
 # libsoftfloat
