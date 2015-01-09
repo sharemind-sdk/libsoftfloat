@@ -45,8 +45,10 @@ ADD_DEFINITIONS(${LIBSOFTFLOAT_INSTALL_DEFINITIONS})
 ################################################################################
 
 SET(SHAREMIND_LIBSOFTFLOAT_HEADERS
+    "3rdparty/libsoftfloat/macros.h"
     "3rdparty/libsoftfloat/milieu.h"
     "3rdparty/libsoftfloat/softfloat.h"
+    "3rdparty/libsoftfloat/specialize.h"
 )
 
 ADD_LIBRARY("libsoftfloat" STATIC "3rdparty/libsoftfloat/softfloat.c"
