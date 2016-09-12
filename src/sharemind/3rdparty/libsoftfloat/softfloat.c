@@ -30,8 +30,10 @@
 
 /*
  * This file is derivative of part of the SoftFloat IEC/IEEE
- * Floating-point Arithmetic Package, Release 2b.
-*/
+ * Floating-point Arithmetic Package, Release 2b
+ * and of the SoftFloat IEEE Floating-Point Arithmetic
+ * Package, Release 3b
+ */
 
 /*============================================================================
 
@@ -61,6 +63,41 @@ Derivative works are acceptable, even for commercial purposes, so long as
 (1) the source code for the derivative work includes prominent notice that
 the work is derivative, and (2) the source code includes prominent notice with
 these four paragraphs for those parts of this code that are retained.
+
+=============================================================================*/
+
+/*============================================================================
+
+This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
+Package, Release 3b, by John R. Hauser.
+
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All Rights Reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+    this list of conditions, and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
@@ -625,6 +662,43 @@ sf_result64f sf_int64_to_float64(sf_int64 a, sf_fpu_state fpu) {
     return sf_normalizeRoundAndPackFloat64(zSign, 0x43C, (sf_bits64) (zSign ? -a : a), fpu);
 }
 
+// This function is back-ported from Softfloat release 3b
+sf_result32f sf_uint64_to_float32(sf_uint64 a, sf_fpu_state fpu) {
+    sf_int8 shiftDist;
+    sf_float32 u;
+    sf_uint32 sig;
+
+    shiftDist = (sf_int8) (sf_countLeadingZeros64(a) - 40);
+    if ( 0 <= shiftDist ) {
+        u = a ? sf_packFloat32(0, 0x95 - shiftDist, (sf_bits32) a<<shiftDist) : 0;
+        return (sf_result32f) { u, fpu };
+    } else {
+        shiftDist = (sf_int8) (shiftDist + 7);
+        sf_uint8 uShiftDist = (sf_uint8) -shiftDist;
+        sig =
+            (shiftDist < 0) ? a>>uShiftDist | ((a & (((sf_uint64) 1<<uShiftDist) - 1)) != 0)
+                : (sf_uint32) a<<shiftDist;
+        return sf_roundAndPackFloat32(0, 0x9C - shiftDist, (sf_bits32) sig, fpu);
+    }
+
+}
+
+// This function is back-ported from Softfloat release 3b
+sf_result64f sf_uint64_to_float64(sf_uint64 a, sf_fpu_state fpu) {
+    if (! a) {
+        return (sf_result64f) { 0, fpu };
+    }
+    if (a & SF_ULIT64( 0x8000000000000000 )) {
+        return
+            sf_roundAndPackFloat64(0, 0x43D,
+                    a>>1 | ((a & 1ul) != 0),
+                    fpu);
+    } else {
+        return sf_normalizeRoundAndPackFloat64(0, 0x43C, a, fpu);
+    }
+
+}
+
 /*----------------------------------------------------------------------------
 | Returns the result of converting the single-precision floating-point value
 | `a' to the 32-bit two's complement integer format.  The conversion is
@@ -813,8 +887,8 @@ sf_result64ui sf_float32_to_uint64(sf_float32 a, sf_fpu_state fpu) {
     if ( shiftDist < 0 ) {
         sf_float_raise(fpu, sf_float_flag_invalid);
         return (sf_result64ui)
-            { (exp == 0xFF) && sig ? UINT64_C( 0xFFFFFFFFFFFFFFFF )
-                  : sign ? 0 : UINT64_C( 0xFFFFFFFFFFFFFFFF ), fpu };
+            { (exp == 0xFF) && sig ? SF_ULIT64( 0xFFFFFFFFFFFFFFFF )
+                  : sign ? 0 : SF_ULIT64( 0xFFFFFFFFFFFFFFFF ), fpu };
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

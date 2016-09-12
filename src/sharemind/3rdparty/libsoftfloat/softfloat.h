@@ -190,6 +190,8 @@ inline sf_result64f sf_int32_to_float64_fpu(const sf_int32 v,
 
 sf_result32f sf_int64_to_float32(sf_int64, sf_fpu_state);
 sf_result64f sf_int64_to_float64(sf_int64, sf_fpu_state);
+sf_result32f sf_uint64_to_float32(sf_uint64, sf_fpu_state);
+sf_result64f sf_uint64_to_float64(sf_uint64, sf_fpu_state);
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE single-precision conversion routines.
