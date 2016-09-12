@@ -159,6 +159,11 @@ typedef struct {
     sf_fpu_state fpu_state;
 } sf_result64i;
 
+typedef struct {
+    sf_uint64 result;
+    sf_fpu_state fpu_state;
+} sf_result64ui;
+
 /*----------------------------------------------------------------------------
 | Routine to raise any or all of the software IEC/IEEE floating-point
 | exception flags specified by `flags'.  Floating-point traps can be
@@ -193,6 +198,7 @@ sf_result32i sf_float32_to_int32(sf_float32, sf_fpu_state);
 sf_result32i sf_float32_to_int32_round_to_zero(sf_float32, sf_fpu_state);
 sf_result64i sf_float32_to_int64(sf_float32, sf_fpu_state);
 sf_result64i sf_float32_to_int64_round_to_zero(sf_float32, sf_fpu_state);
+sf_result64ui sf_float32_to_uint64(sf_float32, sf_fpu_state);
 sf_result64f sf_float32_to_float64(sf_float32, sf_fpu_state);
 
 
@@ -230,6 +236,7 @@ sf_result32i sf_float64_to_int32(sf_float64, sf_fpu_state);
 sf_result32i sf_float64_to_int32_round_to_zero(sf_float64, sf_fpu_state);
 sf_result64i sf_float64_to_int64(sf_float64, sf_fpu_state);
 sf_result64i sf_float64_to_int64_round_to_zero(sf_float64, sf_fpu_state);
+sf_result64ui sf_float64_to_uint64(sf_float64, sf_fpu_state);
 sf_result32f sf_float64_to_float32(sf_float64, sf_fpu_state);
 
 /*----------------------------------------------------------------------------

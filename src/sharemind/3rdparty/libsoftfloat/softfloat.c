@@ -194,6 +194,48 @@ static sf_result64i sf_roundAndPackInt64(sf_flag zSign,
 
 }
 
+// This function is back-ported from Softfloat release 3b
+sf_result64ui sf_roundAndPackUint64(sf_flag sign,
+                                    sf_uint64 sig,
+                                    sf_uint64 sigExtra,
+                                    sf_fpu_state fpu)
+{
+    sf_flag roundNearEven, doIncrement;
+    sf_uint8 roundingMode;
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    roundingMode = (fpu & sf_fpu_state_rounding_mask);
+    roundNearEven = (roundingMode == sf_float_round_nearest_even);
+    doIncrement = (SF_ULIT64( 0x8000000000000000 ) <= sigExtra);
+    if ( ! roundNearEven ) {
+        doIncrement =
+            (roundingMode
+                 == (sign ? sf_float_round_down : sf_float_round_up))
+                && sigExtra;
+    }
+    if ( doIncrement ) {
+        ++sig;
+        if ( ! sig ) goto invalid;
+        sig &=
+            ~(sf_uint64)
+                 (! (sigExtra & SF_ULIT64( 0x7FFFFFFFFFFFFFFF ))
+                      && roundNearEven);
+    }
+    if ( sign && sig ) goto invalid;
+    if ( sigExtra ) {
+        sf_float_raise(fpu, sf_float_flag_inexact);
+    }
+    return (sf_result64ui) { sig, fpu };
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+ invalid:
+    sf_float_raise(fpu, sf_float_flag_invalid);
+    return (sf_result64ui) { (sign ? 0 : SF_ULIT64( 0xFFFFFFFFFFFFFFFF )),
+                             fpu };
+
+}
+
 /*----------------------------------------------------------------------------
 | Returns the fraction bits of the single-precision floating-point value `a'.
 *----------------------------------------------------------------------------*/
@@ -750,6 +792,36 @@ sf_result64i sf_float32_to_int64_round_to_zero(sf_float32 a, sf_fpu_state fpu) {
         z = -z;
 
     return (sf_result64i) { z, fpu };
+}
+
+// This function is back-ported from Softfloat release 3b
+sf_result64ui sf_float32_to_uint64(sf_float32 a, sf_fpu_state fpu) {
+    sf_flag sign;
+    sf_int16 exp;
+    sf_uint32 sig;
+    sf_int16 shiftDist;
+    sf_uint64 sig64, extra;
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    sign = sf_extractFloat32Sign(a);
+    exp  = sf_extractFloat32Exp(a);
+    sig  = sf_extractFloat32Frac(a);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    shiftDist = 0xBE - exp;
+    if ( shiftDist < 0 ) {
+        sf_float_raise(fpu, sf_float_flag_invalid);
+        return (sf_result64ui)
+            { (exp == 0xFF) && sig ? UINT64_C( 0xFFFFFFFFFFFFFFFF )
+                  : sign ? 0 : UINT64_C( 0xFFFFFFFFFFFFFFFF ), fpu };
+    }
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    if ( exp ) sig |= 0x00800000;
+    sig64 = (sf_uint64) sig<<40;
+    sf_shift64ExtraRightJamming(sig64, 0, shiftDist, &sig64, &extra);
+    return sf_roundAndPackUint64(sign, sig64, extra, fpu);
 }
 
 /*----------------------------------------------------------------------------
@@ -1711,6 +1783,41 @@ sf_result64i sf_float64_to_int64_round_to_zero(sf_float64 a, sf_fpu_state fpu) {
         z = -z;
 
     return (sf_result64i) { z, fpu };
+}
+
+// This function is back-ported from Softfloat release 3b
+sf_result64ui sf_float64_to_uint64(sf_float64 a, sf_fpu_state fpu) {
+    sf_flag sign;
+    sf_int16 exp;
+    sf_uint64 sig, sigExtra;
+    sf_int16 shiftDist;
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    sign = sf_extractFloat64Sign(a);
+    exp  = sf_extractFloat64Exp(a);
+    sig  = sf_extractFloat64Frac(a);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    if ( exp ) sig |= SF_ULIT64( 0x0010000000000000 );
+    shiftDist = 0x433 - exp;
+    if ( shiftDist <= 0 ) {
+        if ( shiftDist < -11 ) goto invalid;
+        sig = sig<<-shiftDist;
+        sigExtra = 0;
+    } else {
+        sf_shift64ExtraRightJamming(sig, 0, shiftDist, &sig, &sigExtra);
+    }
+    return sf_roundAndPackUint64(sign, sig, sigExtra, fpu);
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+ invalid:
+    sf_float_raise(fpu, sf_float_flag_invalid);
+    return (sf_result64ui)
+        { (exp == 0x7FF) && sf_extractFloat64Frac(a) ? SF_ULIT64( 0xFFFFFFFFFFFFFFFF )
+              : sign ? 0 : SF_ULIT64( 0xFFFFFFFFFFFFFFFF ), fpu };
+
 }
 
 /*----------------------------------------------------------------------------
