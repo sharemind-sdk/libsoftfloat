@@ -232,10 +232,10 @@ static sf_result64i sf_roundAndPackInt64(sf_flag zSign,
 }
 
 // This function is back-ported from Softfloat release 3b
-sf_result64ui sf_roundAndPackUint64(sf_flag sign,
-                                    sf_uint64 sig,
-                                    sf_uint64 sigExtra,
-                                    sf_fpu_state fpu)
+static sf_result64ui sf_roundAndPackUint64(sf_flag sign,
+                                           sf_uint64 sig,
+                                           sf_uint64 sigExtra,
+                                           sf_fpu_state fpu)
 {
     sf_flag roundNearEven, doIncrement;
     sf_uint8 roundingMode;
