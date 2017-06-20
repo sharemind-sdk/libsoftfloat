@@ -31,6 +31,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION "2.8.12")
 PROJECT("SHAREMIND_LIBSOFTFLOAT" "C")
 
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "1")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(LIBSOFTFLOAT_VERSION
+    "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
 INCLUDE("${CMAKE_CURRENT_SOURCE_DIR}/config.local" OPTIONAL)
 INCLUDE("${CMAKE_CURRENT_BINARY_DIR}/config.local" OPTIONAL)
 
@@ -76,17 +82,18 @@ SET(SHAREMIND_LIBSOFTFLOAT_HEADERS
 ADD_LIBRARY("libsoftfloat" STATIC "3rdparty/libsoftfloat/softfloat.c"
                                   ${SHAREMIND_LIBSOFTFLOAT_HEADERS})
 
-SET(LIBSOFTFLOAT_VERSION "0.1.0.0")
 SET_TARGET_PROPERTIES("libsoftfloat" PROPERTIES
                       OUTPUT_NAME "sharemind_softfloat"
                       VERSION "${LIBSOFTFLOAT_VERSION}"
                       SOVERSION "0.1")
 
 INSTALL(TARGETS "libsoftfloat"
+        COMPONENT static
         ARCHIVE DESTINATION "lib")
 
 INSTALL(FILES ${SHAREMIND_LIBSOFTFLOAT_HEADERS}
-        DESTINATION "include/sharemind/3rdparty/libsoftfloat/")
+        DESTINATION "include/sharemind/3rdparty/libsoftfloat/"
+        COMPONENT dev)
 
 # Install cmake files:
 FILE(GLOB_RECURSE sharemind_libsoftfloat_in_files
@@ -110,4 +117,27 @@ CONFIGURE_FILE(
 INSTALL(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/SharemindLibsoftfloatConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/SharemindLibsoftfloatConfigVersion.cmake"
-    DESTINATION "lib/SharemindLibsoftfloat")
+    DESTINATION "lib/SharemindLibsoftfloat"
+    COMPONENT dev)
+
+
+# Packaging:
+SET(CPACK_PACKAGE_VENDOR "Cybernetica AS")
+SET(CPACK_PACKAGE_CONTACT "Sharemind packaging <sharemind-packaging@cyber.ee>")
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_NAME "libsharemind-softfloat")
+SET(CPACK_DEBIAN_PACKAGE_RELEASE "cyber1")
+SET(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
+SET(CPACK_DEB_COMPONENT_INSTALL "ON")
+SET(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+
+SET(CPACK_COMPONENT_DEV_DESCRIPTION
+    "Sharemind SoftFloat library development headers")
+SET(CPACK_COMPONENT_STATIC_DESCRIPTION "Sharemind SoftFloat library (static)")
+SET(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS
+    "libsharemind-softfloat-static (= ${LIBSOFTFLOAT_VERSION}), libc6-dev (>= 2.19)")
+SET(CPACK_DEBIAN_STATIC_PACKAGE_DEPENDS "libc6 (>= 2.19)")
+SET(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
+SET(CPACK_DEBIAN_STATIC_PACKAGE_SECTION "libs")
+SET(CPACK_DEBIAN_DEV_PACKAGE_ARCHITECTURE "any")
+INCLUDE(CPack)
