@@ -74,8 +74,6 @@ these four paragraphs for those parts of this code that are retained.
 extern "C" {
 #endif
 
-#pragma GCC visibility push(internal)
-
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point types.
 *----------------------------------------------------------------------------*/
@@ -260,8 +258,6 @@ sf_resultFlag sf_float64_eq_signaling(sf_float64, sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_le_quiet(sf_float64, sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_lt_quiet(sf_float64, sf_float64, sf_fpu_state);
 sf_flag sf_float64_is_signaling_nan(sf_float64);
-
-#pragma GCC visibility pop
 
 #ifdef __cplusplus
 } /* extern "C" { */

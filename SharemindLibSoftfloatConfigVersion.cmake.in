@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015, Cybernetica AS
+# Copyright (c) Cybernetica AS
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,12 +28,19 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# This file defines the following variables:
-#   SharemindLibsoftfloat_INCLUDE_DIRS - include directories
-#   SharemindLibsoftfloat_LIBRARIES    - libraries to link against
-#   SharemindLibsoftfloat_DEFINITIONS  - required compiler definitions
+SET(PACKAGE_VERSION "@SharemindLibSoftfloat_VERSION@")
+IF(NOT SharemindLibSoftfloat_QUIET)
+    MESSAGE(STATUS "Sharemind libsoftfloat version: ${PACKAGE_VERSION}")
+ENDIF()
 
+IF("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")
+  SET(PACKAGE_VERSION_COMPATIBLE FALSE)
+  SET(PACKAGE_VERSION_EXACT FALSE)
+ELSEIF("${PACKAGE_VERSION}" VERSION_GREATER "${PACKAGE_FIND_VERSION}")
+  SET(PACKAGE_VERSION_COMPATIBLE TRUE)
+  SET(PACKAGE_VERSION_EXACT FALSE)
+ELSE()
+  SET(PACKAGE_VERSION_COMPATIBLE TRUE)
+  SET(PACKAGE_VERSION_EXACT TRUE)
+ENDIF()
 
-SET(SharemindLibsoftfloat_INCLUDE_DIRS @LIBSOFTFLOAT_INSTALL_INCLUDE_DIRS@)
-SET(SharemindLibsoftfloat_LIBRARIES @LIBSOFTFLOAT_INSTALL_LINK_LIBRARIES@)
-SET(SharemindLibsoftfloat_DEFINITIONS @LIBSOFTFLOAT_INSTALL_DEFINITIONS@)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015, Cybernetica AS
+# Copyright (c) Cybernetica AS
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,74 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION "2.8")
-PROJECT("SHAREMIND_LIBSOFTFLOAT" "C")
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+PROJECT(SharemindLibSoftfloat VERSION 0.1.0 LANGUAGES C)
 
 INCLUDE("${CMAKE_CURRENT_SOURCE_DIR}/config.local" OPTIONAL)
 INCLUDE("${CMAKE_CURRENT_BINARY_DIR}/config.local" OPTIONAL)
 
-ADD_SUBDIRECTORY("src/sharemind/")
+FIND_PACKAGE(SharemindCMakeHelpers REQUIRED)
+
+SharemindSetProjectVersion()
+
+SharemindSetC99CompileOptions(COMPILE_FLAGS "-fwrapv")
+
+SET(SharemindLibSoftfloat_INSTALL_DEFINITIONS
+    "-D__STDC_LIMIT_MACROS"
+    "-D__STDC_CONSTANT_MACROS"
+)
+
+
+################################################################################
+# libsoftfloat
+################################################################################
+
+SET(SharemindLibSoftfloat_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/macros.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/milieu.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/softfloat.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/specialize.h"
+)
+
+SharemindAddSharedLibrary("libsoftfloat"
+    OUTPUT_NAME "sharemind_softfloat"
+    SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/softfloat.c"
+            ${SharemindLibSoftfloat_HEADERS})
+
+INSTALL(FILES ${SharemindLibSoftfloat_HEADERS}
+        DESTINATION "include/sharemind/libsoftfloat/"
+        COMPONENT dev)
+
+# Install cmake files:
+SET(SharemindLibSoftfloat_INSTALL_LINK_LIBRARIES
+    "-L${CMAKE_INSTALL_PREFIX}/lib"
+    "-lsharemind_softfloat"
+)
+
+SET(SharemindLibSoftfloat_INSTALL_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+
+SharemindUseCMakeFindFiles()
+
+
+# Packaging:
+SharemindSetupPackaging()
+SharemindAddComponentPackage("lib"
+    NAME "libsharemind-softfloat"
+    DESCRIPTION "Sharemind SoftFloat library"
+    DEB_SECTION "libs"
+    DEB_DEPENDS "libc6 (>= 2.19)")
+SharemindAddComponentPackage("dev"
+    NAME "libsharemind-softfloat-dev"
+    DESCRIPTION "Sharemind SoftFloat library development headers"
+    DEB_SECTION "libdevel"
+    DEB_DEPENDS
+        "libsharemind-softfloat (= ${SharemindLibSoftfloat_VERSION})"
+        "libc6-dev (>= 2.19)"
+)
+SharemindAddComponentPackage("debug"
+    NAME "libsharemind-softfloat-dbg"
+    DESCRIPTION "Sharemind SoftFloat library debugging symbols"
+    DEB_SECTION "debug"
+    DEB_DEPENDS "libsharemind-softfloat (= ${SharemindLibSoftfloat_VERSION})"
+)
+SharemindPackagingFinalize()
