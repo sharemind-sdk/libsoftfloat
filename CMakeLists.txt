@@ -40,11 +40,6 @@ SharemindSetProjectVersion()
 
 SharemindSetC99CompileOptions(COMPILE_FLAGS "-fwrapv")
 
-SET(SharemindLibSoftfloat_INSTALL_DEFINITIONS
-    "-D__STDC_LIMIT_MACROS"
-    "-D__STDC_CONSTANT_MACROS"
-)
-
 
 ################################################################################
 # libsoftfloat
@@ -67,14 +62,16 @@ INSTALL(FILES ${SharemindLibSoftfloat_HEADERS}
         COMPONENT dev)
 
 # Install cmake files:
-SET(SharemindLibSoftfloat_INSTALL_LINK_LIBRARIES
-    "-L${CMAKE_INSTALL_PREFIX}/lib"
-    "-lsharemind_softfloat"
+SharemindCreateCMakeFindFiles(
+    INCLUDE_DIRS
+        "${CMAKE_INSTALL_PREFIX}/include"
+    DEFINITIONS
+        "-D__STDC_LIMIT_MACROS"
+        "-D__STDC_CONSTANT_MACROS"
+    LIBRARIES
+        "-L${CMAKE_INSTALL_PREFIX}/lib"
+        "-lsharemind_softfloat"
 )
-
-SET(SharemindLibSoftfloat_INSTALL_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
-
-SharemindUseCMakeFindFiles()
 
 
 # Packaging:
