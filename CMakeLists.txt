@@ -38,6 +38,8 @@ FIND_PACKAGE(SharemindCMakeHelpers REQUIRED)
 
 SharemindSetProjectVersion()
 
+FIND_PACKAGE(SharemindCHeaders 1.1.0 REQUIRED)
+
 SharemindSetC99CompileOptions(COMPILE_FLAGS "-fwrapv")
 
 
@@ -54,8 +56,16 @@ SET(SharemindLibSoftfloat_HEADERS
 
 SharemindAddSharedLibrary("libsoftfloat"
     OUTPUT_NAME "sharemind_softfloat"
-    SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/softfloat.c"
-            ${SharemindLibSoftfloat_HEADERS})
+    SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/softfloat.c"
+        ${SharemindLibSoftfloat_HEADERS}
+    INCLUDE_DIRECTORIES
+        ${SharemindCHeaders_INCLUDE_DIRS}
+    LEGACY_DEFINITIONS
+        ${SharemindCHeaders_DEFINITIONS}
+    LINK_LIBRARIES
+        ${SharemindCHeaders_LIBRARIES}
+)
 
 INSTALL(FILES ${SharemindLibSoftfloat_HEADERS}
         DESTINATION "include/sharemind/libsoftfloat/"

@@ -67,6 +67,7 @@ these four paragraphs for those parts of this code that are retained.
 #ifndef SHAREMIND_SOFTFLOAT_SOFTFLOAT_H
 #define SHAREMIND_SOFTFLOAT_SOFTFLOAT_H
 
+#include <sharemind/casts.h>
 #include "milieu.h"
 
 
@@ -124,10 +125,11 @@ typedef sf_bits64 sf_float64;
 | Software FPU state.
 *----------------------------------------------------------------------------*/
 typedef sf_uint16 sf_fpu_state;
-#define sf_fpu_state_default ((sf_fpu_state) (sf_float_tininess_after_rounding \
-                                              | sf_float_round_nearest_even \
-                                              | sf_float_flag_crash_divbyzero \
-                                              | sf_float_flag_crash_invalid))
+#define sf_fpu_state_default \
+    (SHAREMIND_STATIC_CAST(sf_fpu_state)(sf_float_tininess_after_rounding \
+                                         | sf_float_round_nearest_even \
+                                         | sf_float_flag_crash_divbyzero \
+                                         | sf_float_flag_crash_invalid))
 
 /*----------------------------------------------------------------------------
 | Software IEC/IEEE floating-point function results carrying the FPU state.
@@ -182,9 +184,14 @@ typedef struct {
 *----------------------------------------------------------------------------*/
 sf_result32f sf_int32_to_float32(sf_int32, sf_fpu_state);
 sf_float64 sf_int32_to_float64(sf_int32);
-inline sf_result64f sf_int32_to_float64_fpu(const sf_int32 v,
-                                            const sf_fpu_state fpu)
-{ return (sf_result64f) { sf_int32_to_float64(v), fpu }; }
+inline sf_result64f sf_int32_to_float64_fpu(sf_int32 const v,
+                                            sf_fpu_state const fpu)
+{
+    sf_result64f r;
+    r.result = sf_int32_to_float64(v);
+    r.fpu_state = fpu;
+    return r;
+}
 
 sf_result32f sf_int64_to_float32(sf_int64, sf_fpu_state);
 sf_result64f sf_int64_to_float64(sf_int64, sf_fpu_state);
@@ -213,8 +220,8 @@ sf_result64f sf_roundAndPackFloat64(sf_flag, sf_int16, sf_bits64, sf_fpu_state);
 | Software IEC/IEEE single-precision operations.
 *----------------------------------------------------------------------------*/
 sf_result32f sf_float32_round_to_int(sf_float32, sf_fpu_state);
-inline sf_float32 sf_float32_neg(const sf_float32 n)
-{ return n ^ (sf_bits32) 0x80000000; }
+inline sf_float32 sf_float32_neg(sf_float32 const n)
+{ return n ^ SHAREMIND_STATIC_CAST(sf_bits32)(0x80000000); }
 sf_result32f sf_float32_add(sf_float32, sf_float32, sf_fpu_state);
 sf_result32f sf_float32_sub(sf_float32, sf_float32, sf_fpu_state);
 sf_result32f sf_float32_mul(sf_float32, sf_float32, sf_fpu_state);
@@ -243,8 +250,8 @@ sf_result32f sf_float64_to_float32(sf_float64, sf_fpu_state);
 | Software IEC/IEEE double-precision operations.
 *----------------------------------------------------------------------------*/
 sf_result64f sf_float64_round_to_int(sf_float64, sf_fpu_state);
-static inline sf_float64 sf_float64_neg(const sf_float64 n)
-{ return n ^ (sf_bits64) SF_ULIT64(0x8000000000000000); }
+inline sf_float64 sf_float64_neg(sf_float64 const n)
+{ return n ^ SHAREMIND_STATIC_CAST(sf_bits64)(SF_ULIT64(0x8000000000000000)); }
 sf_result64f sf_float64_add(sf_float64, sf_float64, sf_fpu_state);
 sf_result64f sf_float64_sub(sf_float64, sf_float64, sf_fpu_state);
 sf_result64f sf_float64_mul(sf_float64, sf_float64, sf_fpu_state);
