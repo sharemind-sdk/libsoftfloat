@@ -121,6 +121,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 
+#define DEFINE_NEGATING_COMPARISON(type,name,comp) \
+    sf_resultFlag type ## _ ## name(type a, type b, sf_fpu_state fpu) { \
+        sf_resultFlag r = type ## _ ## comp(a, b, fpu); \
+        r.result = !r.result; \
+        return r; \
+    }
+#define DEFINE_SWAPPED_COMPARISON(type,name,comp) \
+    sf_resultFlag type ## _ ## name(type a, type b, sf_fpu_state fpu) \
+    { return type ## _ ## comp(b, a, fpu); }
+
 /*----------------------------------------------------------------------------
 | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
 | and 7, and returns the properly rounded 32-bit integer corresponding to the
@@ -1556,6 +1566,13 @@ sf_resultFlag sf_float32_eq(sf_float32 a, sf_float32 b, sf_fpu_state fpu) {
 }
 
 /*----------------------------------------------------------------------------
+| Returns 1 if the single-precision floating-point value `a' is not equal to
+| the corresponding value `b', and 0 otherwise.  The comparison is performed
+| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_NEGATING_COMPARISON(sf_float32,ne,eq)
+
+/*----------------------------------------------------------------------------
 | Returns 1 if the single-precision floating-point value `a' is less than
 | or equal to the corresponding value `b', and 0 otherwise.  The comparison
 | is performed according to the IEC/IEEE Standard for Binary Floating-Point
@@ -1605,6 +1622,21 @@ sf_resultFlag sf_float32_lt(sf_float32 a, sf_float32 b, sf_fpu_state fpu) {
 }
 
 /*----------------------------------------------------------------------------
+| Returns 1 if the single-precision floating-point value `a' is greater than
+| or equal to the corresponding value `b', and 0 otherwise.  The comparison
+| is performed according to the IEC/IEEE Standard for Binary Floating-Point
+| Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float32,ge,le)
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the single-precision floating-point value `a' is greater than
+| the corresponding value `b', and 0 otherwise.  The comparison is performed
+| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float32,gt,lt)
+
+/*----------------------------------------------------------------------------
 | Returns 1 if the single-precision floating-point value `a' is equal to
 | the corresponding value `b', and 0 otherwise.  The invalid exception is
 | raised if either operand is a NaN.  Otherwise, the comparison is performed
@@ -1620,6 +1652,14 @@ sf_resultFlag sf_float32_eq_signaling(sf_float32 a, sf_float32 b, sf_fpu_state f
 
     return (sf_resultFlag) { (a == b) || ((sf_bits32) ((a | b) << 1) == 0), fpu };
 }
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the single-precision floating-point value `a' is not equal to
+| the corresponding value `b', and 0 otherwise.  The invalid exception is
+| raised if either operand is a NaN.  Otherwise, the comparison is performed
+| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_NEGATING_COMPARISON(sf_float32,ne_signaling,eq_signaling)
 
 /*----------------------------------------------------------------------------
 | Returns 1 if the single-precision floating-point value `a' is less than or
@@ -1673,6 +1713,22 @@ sf_resultFlag sf_float32_lt_quiet(sf_float32 a, sf_float32 b, sf_fpu_state fpu) 
 
     return (sf_resultFlag) { (a != b) && (aSign ^ (a < b)), fpu };
 }
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the single-precision floating-point value `a' is greater than or
+| equal to the corresponding value `b', and 0 otherwise.  Quiet NaNs do not
+| cause an exception.  Otherwise, the comparison is performed according to the
+| IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float32,ge_quiet,le_quiet)
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the single-precision floating-point value `a' is greater than
+| the corresponding value `b', and 0 otherwise.  Quiet NaNs do not cause an
+| exception.  Otherwise, the comparison is performed according to the IEC/IEEE
+| Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float32,gt_quiet,lt_quiet)
 
 /*----------------------------------------------------------------------------
 | Returns the result of converting the double-precision floating-point value
@@ -2548,6 +2604,13 @@ sf_resultFlag sf_float64_eq(sf_float64 a, sf_float64 b, sf_fpu_state fpu) {
 }
 
 /*----------------------------------------------------------------------------
+| Returns 1 if the double-precision floating-point value `a' is not equal to the
+| corresponding value `b', and 0 otherwise.  The comparison is performed
+| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_NEGATING_COMPARISON(sf_float64,ne,eq)
+
+/*----------------------------------------------------------------------------
 | Returns 1 if the double-precision floating-point value `a' is less than or
 | equal to the corresponding value `b', and 0 otherwise.  The comparison is
 | performed according to the IEC/IEEE Standard for Binary Floating-Point
@@ -2597,6 +2660,21 @@ sf_resultFlag sf_float64_lt(sf_float64 a, sf_float64 b, sf_fpu_state fpu) {
 }
 
 /*----------------------------------------------------------------------------
+| Returns 1 if the double-precision floating-point value `a' is greater than or
+| equal to the corresponding value `b', and 0 otherwise.  The comparison is
+| performed according to the IEC/IEEE Standard for Binary Floating-Point
+| Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float64,ge,le)
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the double-precision floating-point value `a' is greater than
+| the corresponding value `b', and 0 otherwise.  The comparison is performed
+| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float64,gt,lt)
+
+/*----------------------------------------------------------------------------
 | Returns 1 if the double-precision floating-point value `a' is equal to the
 | corresponding value `b', and 0 otherwise.  The invalid exception is raised
 | if either operand is a NaN.  Otherwise, the comparison is performed
@@ -2612,6 +2690,14 @@ sf_resultFlag sf_float64_eq_signaling(sf_float64 a, sf_float64 b, sf_fpu_state f
 
     return (sf_resultFlag) { (a == b) || ((sf_bits64) ((a | b) << 1) == 0), fpu };
 }
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the double-precision floating-point value `a' is not equal to the
+| corresponding value `b', and 0 otherwise.  The invalid exception is raised
+| if either operand is a NaN.  Otherwise, the comparison is performed
+| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_NEGATING_COMPARISON(sf_float64,ne_signaling,eq_signaling)
 
 /*----------------------------------------------------------------------------
 | Returns 1 if the double-precision floating-point value `a' is less than or
@@ -2666,3 +2752,19 @@ sf_resultFlag sf_float64_lt_quiet(sf_float64 a, sf_float64 b, sf_fpu_state fpu) 
 
     return (sf_resultFlag) { (a != b) && (aSign ^ (a < b)), fpu };
 }
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the double-precision floating-point value `a' is greater than or
+| equal to the corresponding value `b', and 0 otherwise.  Quiet NaNs do not
+| cause an exception.  Otherwise, the comparison is performed according to the
+| IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float64,ge_quiet,le_quiet)
+
+/*----------------------------------------------------------------------------
+| Returns 1 if the double-precision floating-point value `a' is greater than
+| the corresponding value `b', and 0 otherwise.  Quiet NaNs do not cause an
+| exception.  Otherwise, the comparison is performed according to the IEC/IEEE
+| Standard for Binary Floating-Point Arithmetic.
+*----------------------------------------------------------------------------*/
+DEFINE_SWAPPED_COMPARISON(sf_float64,gt_quiet,lt_quiet)

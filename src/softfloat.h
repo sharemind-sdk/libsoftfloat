@@ -229,11 +229,17 @@ sf_result32f sf_float32_div(sf_float32, sf_float32, sf_fpu_state);
 sf_result32f sf_float32_rem(sf_float32, sf_float32, sf_fpu_state);
 sf_result32f sf_float32_sqrt(sf_float32, sf_fpu_state);
 sf_resultFlag sf_float32_eq(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_ne(sf_float32, sf_float32, sf_fpu_state);
 sf_resultFlag sf_float32_le(sf_float32, sf_float32, sf_fpu_state);
 sf_resultFlag sf_float32_lt(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_ge(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_gt(sf_float32, sf_float32, sf_fpu_state);
 sf_resultFlag sf_float32_eq_signaling(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_ne_signaling(sf_float32, sf_float32, sf_fpu_state);
 sf_resultFlag sf_float32_le_quiet(sf_float32, sf_float32, sf_fpu_state);
 sf_resultFlag sf_float32_lt_quiet(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_ge_quiet(sf_float32, sf_float32, sf_fpu_state);
+sf_resultFlag sf_float32_gt_quiet(sf_float32, sf_float32, sf_fpu_state);
 sf_flag sf_float32_is_signaling_nan(sf_float32);
 
 /*----------------------------------------------------------------------------
@@ -259,11 +265,17 @@ sf_result64f sf_float64_div(sf_float64, sf_float64, sf_fpu_state);
 sf_result64f sf_float64_rem(sf_float64, sf_float64, sf_fpu_state);
 sf_result64f sf_float64_sqrt(sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_eq(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_ne(sf_float64, sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_le(sf_float64, sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_lt(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_ge(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_gt(sf_float64, sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_eq_signaling(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_ne_signaling(sf_float64, sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_le_quiet(sf_float64, sf_float64, sf_fpu_state);
 sf_resultFlag sf_float64_lt_quiet(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_ge_quiet(sf_float64, sf_float64, sf_fpu_state);
+sf_resultFlag sf_float64_gt_quiet(sf_float64, sf_float64, sf_fpu_state);
 sf_flag sf_float64_is_signaling_nan(sf_float64);
 
 #ifdef __cplusplus
