@@ -96,13 +96,13 @@ SharemindAddComponentPackage("dev"
     DESCRIPTION "Sharemind SoftFloat library development headers"
     DEB_SECTION "libdevel"
     DEB_DEPENDS
-        "libsharemind-softfloat (= ${SharemindLibSoftfloat_VERSION})"
+        "libsharemind-softfloat (= ${SharemindLibSoftfloat_DEB_lib_PACKAGE_VERSION})"
         "libc6-dev (>= 2.19)"
 )
 SharemindAddComponentPackage("debug"
     NAME "libsharemind-softfloat-dbg"
     DESCRIPTION "Sharemind SoftFloat library debugging symbols"
     DEB_SECTION "debug"
-    DEB_DEPENDS "libsharemind-softfloat (= ${SharemindLibSoftfloat_VERSION})"
+    DEB_DEPENDS "libsharemind-softfloat (= ${SharemindLibSoftfloat_DEB_lib_PACKAGE_VERSION})"
 )
 SharemindPackagingFinalize()
