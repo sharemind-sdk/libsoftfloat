@@ -95,6 +95,7 @@ SharemindAddComponentPackage("dev"
     DEB_SECTION "libdevel"
     DEB_DEPENDS
         "libsharemind-softfloat (= ${SharemindLibSoftfloat_DEB_lib_PACKAGE_VERSION})"
+        "libsharemind-cheaders-dev (>= 1.1.0)"
         "libc6-dev (>= 2.19)"
 )
 SharemindAddComponentPackage("debug"
