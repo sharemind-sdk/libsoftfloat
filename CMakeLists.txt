@@ -34,9 +34,9 @@ PROJECT(SharemindLibSoftfloat VERSION 0.2.1 LANGUAGES C)
 INCLUDE("${CMAKE_CURRENT_SOURCE_DIR}/config.local" OPTIONAL)
 INCLUDE("${CMAKE_CURRENT_BINARY_DIR}/config.local" OPTIONAL)
 
-FIND_PACKAGE(SharemindCMakeHelpers 1.3 REQUIRED)
+FIND_PACKAGE(SharemindCMakeHelpers 1.6 REQUIRED)
 
-FIND_PACKAGE(SharemindCHeaders 1.1.0 REQUIRED)
+FIND_PACKAGE(SharemindCHeaders 1.3.0 REQUIRED)
 
 
 # LibSoftfloat:
@@ -47,28 +47,25 @@ SharemindAddSharedLibrary(LibSoftfloat
     SOURCES
         ${SharemindLibSoftfloat_HEADERS}
         ${SharemindLibSoftfloat_SOURCES}
-    INCLUDE_DIRECTORIES
-        ${SharemindCHeaders_INCLUDE_DIRS}
-    LEGACY_DEFINITIONS
-        ${SharemindCHeaders_DEFINITIONS}
-    LINK_LIBRARIES
-        ${SharemindCHeaders_LIBRARIES}
 )
+TARGET_INCLUDE_DIRECTORIES(LibSoftfloat
+    INTERFACE
+        # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> # TODO
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+    )
 TARGET_COMPILE_OPTIONS(LibSoftfloat PRIVATE "-fwrapv") # TODO: Is this needed?
+TARGET_COMPILE_DEFINITIONS(LibSoftfloat
+    PUBLIC
+        "__STDC_LIMIT_MACROS"
+        "__STDC_CONSTANT_MACROS"
+    )
+TARGET_LINK_LIBRARIES(LibSoftfloat PUBLIC Sharemind::CHeaders)
 INSTALL(FILES ${SharemindLibSoftfloat_HEADERS}
         DESTINATION "include/sharemind/libsoftfloat/"
-        COMPONENT dev)
-
-# Install cmake files:
-SharemindCreateCMakeFindFiles(
-    INCLUDE_DIRS
-        "${CMAKE_INSTALL_PREFIX}/include"
-    DEFINITIONS
-        "-D__STDC_LIMIT_MACROS"
-        "-D__STDC_CONSTANT_MACROS"
-    LIBRARIES
-        "-L${CMAKE_INSTALL_PREFIX}/lib"
-        "-lsharemind_softfloat"
+        COMPONENT "dev")
+SharemindCreateCMakeFindFilesForTarget(LibSoftfloat
+    DEPENDENCIES
+        "SharemindCHeaders 1.3.0"
 )
 
 
@@ -85,7 +82,7 @@ SharemindAddComponentPackage("dev"
     DEB_SECTION "libdevel"
     DEB_DEPENDS
         "libsharemind-softfloat (= ${SharemindLibSoftfloat_DEB_lib_PACKAGE_VERSION})"
-        "libsharemind-cheaders-dev (>= 1.1.0)"
+        "libsharemind-cheaders-dev (>= 1.3.0)"
         "libc6-dev (>= 2.19)"
 )
 SharemindAddComponentPackage("debug"
