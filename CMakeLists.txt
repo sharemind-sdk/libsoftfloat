@@ -39,23 +39,14 @@ FIND_PACKAGE(SharemindCMakeHelpers 1.3 REQUIRED)
 FIND_PACKAGE(SharemindCHeaders 1.1.0 REQUIRED)
 
 
-
-################################################################################
-# libsoftfloat
-################################################################################
-
-SET(SharemindLibSoftfloat_HEADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/macros.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/milieu.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/softfloat.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/specialize.h"
-)
-
+# LibSoftfloat:
+FILE(GLOB SharemindLibSoftfloat_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
+FILE(GLOB SharemindLibSoftfloat_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 SharemindAddSharedLibrary(LibSoftfloat
     OUTPUT_NAME "sharemind_softfloat"
     SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/softfloat.c"
         ${SharemindLibSoftfloat_HEADERS}
+        ${SharemindLibSoftfloat_SOURCES}
     INCLUDE_DIRECTORIES
         ${SharemindCHeaders_INCLUDE_DIRS}
     LEGACY_DEFINITIONS
