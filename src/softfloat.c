@@ -626,6 +626,9 @@ sf_float64 sf_int32_to_float64(sf_int32 a) {
     return sf_packFloat64(zSign, 0x432 - shiftCount, zSig << shiftCount);
 }
 
+extern inline sf_result64f
+sf_int32_to_float64_fpu(sf_int32 const v, sf_fpu_state const fpu);
+
 /*----------------------------------------------------------------------------
 | Returns the result of converting the 64-bit two's complement integer `a'
 | to the single-precision floating-point format.  The conversion is performed
@@ -1009,6 +1012,8 @@ sf_result32f sf_float32_round_to_int(sf_float32 a, sf_fpu_state fpu) {
 
     return (sf_result32f) { z, fpu };
 }
+
+extern inline sf_float32 sf_float32_neg(sf_float32 const n);
 
 /*----------------------------------------------------------------------------
 | Returns the result of adding the absolute values of the single-precision
@@ -2057,6 +2062,8 @@ sf_result64f sf_float64_round_to_int(sf_float64 a, sf_fpu_state fpu) {
 
     return (sf_result64f) { z, fpu };
 }
+
+extern inline sf_float64 sf_float64_neg(sf_float64 const n);
 
 /*----------------------------------------------------------------------------
 | Returns the result of adding the absolute values of the double-precision
