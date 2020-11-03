@@ -67,7 +67,7 @@ these four paragraphs for those parts of this code that are retained.
 #ifndef SHAREMIND_SOFTFLOAT_SPECIALIZE_H
 #define SHAREMIND_SOFTFLOAT_SPECIALIZE_H
 
-#include "softfloat.h"
+#include "../softfloat.h"
 
 
 #ifdef __cplusplus

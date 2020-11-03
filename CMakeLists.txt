@@ -41,11 +41,14 @@ FIND_PACKAGE(SharemindCHeaders 1.3.0 REQUIRED)
 
 # LibSoftfloat:
 FILE(GLOB SharemindLibSoftfloat_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
+FILE(GLOB_RECURSE SharemindLibSoftfloat_HEADERS_P
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/internal/*.h")
 FILE(GLOB SharemindLibSoftfloat_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 SharemindAddSharedLibrary(LibSoftfloat
     OUTPUT_NAME "sharemind_softfloat"
     SOURCES
         ${SharemindLibSoftfloat_HEADERS}
+        ${SharemindLibSoftfloat_HEADERS_P}
         ${SharemindLibSoftfloat_SOURCES}
 )
 TARGET_INCLUDE_DIRECTORIES(LibSoftfloat

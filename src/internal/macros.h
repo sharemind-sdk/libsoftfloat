@@ -67,7 +67,7 @@ these four paragraphs for those parts of this code that are retained.
 #ifndef SHAREMIND_SOFTFLOAT_MACROS_H
 #define SHAREMIND_SOFTFLOAT_MACROS_H
 
-#include "milieu.h"
+#include "../milieu.h"
 
 #ifdef __cplusplus
 extern "C" {
