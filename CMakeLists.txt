@@ -54,7 +54,7 @@ SharemindAddSharedLibrary(LibSoftfloat
 TARGET_INCLUDE_DIRECTORIES(LibSoftfloat
     INTERFACE
         # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> # TODO
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+        $<INSTALL_INTERFACE:include>
     )
 TARGET_COMPILE_OPTIONS(LibSoftfloat PRIVATE "-fwrapv") # TODO: Is this needed?
 TARGET_COMPILE_DEFINITIONS(LibSoftfloat
